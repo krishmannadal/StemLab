@@ -41,7 +41,7 @@ Use Python 3.11 or 3.12. Do not use Python 3.13 for these pinned model dependenc
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-local.txt
 python run.py
 ```
 
@@ -49,7 +49,7 @@ For a smaller CPU-only installation, install torch and torchaudio before the oth
 
 ```bash
 python -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-local.txt
 ```
 
 ## Prepare before presenting
@@ -73,7 +73,7 @@ Once dependencies are installed, run `.venv\Scripts\python.exe prepare_model.py`
 - `app.py`: FastAPI endpoints, upload/decode pipeline, persistent sessions, mixing and export.
 - `worker.py`: isolated Demucs/PyTorch inference process; GPU selected automatically.
 - `static/index.html`, `style.css`, `app.js`: responsive mixing desk and Web Audio playback.
-- `requirements.txt`: matched dependency versions.
+- `requirements-local.txt`: matched dependency versions.
 - `tests/test_workflow.py`: integration checks for audio arithmetic, crop lengths, session persistence and invalid requests.
 - `SUBMISSION.md`: abstract, methodology, demo script and viva answers.
 - `VALIDATION.md`: what was actually verified during development.

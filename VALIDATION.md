@@ -43,3 +43,7 @@ Then upload a short real music excerpt, wait for separation, listen to each sour
 - Desktop/mobile layouts visually inspected. The model-worker transferable buffer handling was corrected after the initial smoke test exposed shared ArrayBuffers.
 
 The live Netlify Blob integration must still be verified after deployment. Local browser checks route static files/account requests through the test harness because this execution environment restricts local socket access. These checks do not establish Netlify deployment success. Chrome's headless WASM path was used here; real-device WebGPU performance was not benchmarked.
+
+### Netlify build correction
+
+The first Netlify deployment detected the legacy root requirements.txt and attempted to install PyTorch using its default Python version before the Node build. Those requirements are now requirements-local.txt, and both local launchers reference that file. Netlify therefore installs only the Node web dependencies.
