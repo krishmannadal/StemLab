@@ -47,3 +47,14 @@ The live Netlify Blob integration must still be verified after deployment. Local
 ### Netlify build correction
 
 The first Netlify deployment detected the legacy root requirements.txt and attempted to install PyTorch using its default Python version before the Node build. Those requirements are now requirements-local.txt, and both local launchers reference that file. Netlify therefore installs only the Node web dependencies.
+
+## Phone renderer crash mitigation / 13 October 2026
+
+The reported Android Chrome “Aw, Snap!” screen indicates a renderer crash rather than a caught application error. Memory pressure during inference is the likely explanation; no phone crash dump was available to prove the exact cause.
+
+- Mobile/tablet and browsers reporting less than 8 GB RAM are blocked before audio decoding, worker creation or model download. This does not add mobile neural inference support.
+- Model weights are assembled directly into one preallocated buffer; all parts are no longer retained alongside a second full weights copy.
+- Input normalization happens in place. Inference uses single-thread WASM with CPU memory arena/pattern options disabled, and its worker is terminated once output arrives.
+- Desktop input is limited to 30 seconds / 10 MB. An interrupted-job marker offers recovery guidance after a reload.
+- Six Node tests passed, including mobile/iPad/limited-memory policy checks and sequential model assembly.
+- Chromium desktop test passed actual ONNX inference on a two-second generated input plus account/mixer/export flows. An Android user-agent test confirmed both the picker and direct-upload path trigger no model/worker requests; login and the demo still work. This is browser emulation, not a hardware test on the user's Motorola.

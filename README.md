@@ -8,7 +8,7 @@ The web edition runs pretrained Demucs entirely in the browser using ONNX Runtim
 ## Web features
 
 - Unique email/password accounts, server-side salted scrypt password hashes and opaque cookie sessions.
-- Four-source neural separation in a dedicated browser worker; WebGPU where supported with WASM fallback.
+- Four-source neural separation in a dedicated browser worker; WASM on desktop browsers with bounded memory settings.
 - Shared-clock mixer, original comparison, practice presets, mute/solo and channel volumes.
 - A–B rehearsal loops, section export, WAV export and source-stem ZIP download.
 - Per-account audio sessions stored in IndexedDB on the current device.
@@ -27,7 +27,7 @@ Import this GitHub repository into Netlify. The root `netlify.toml` configures e
 
 Choose the **Free** plan. No database credentials or model API keys are required. Functions receive Netlify Blobs credentials from the platform. The project uses metered hosting bandwidth/requests/Functions within Netlify's plan limits; it is not unlimited hosting.
 
-The build downloads the pretrained ONNX weights from the pinned `demucs` npm package, splits them into 8 MiB static parts and copies the runtime assets. The first visitor separation downloads approximately **166 MiB**; the worker caches it for later runs. Use a laptop with Chrome or Edge and begin with a **10–30 second excerpt**. The web app limits inference input to **60 seconds / 30 MB** to reduce browser memory pressure. A weak phone may run slowly or run out of memory.
+The build downloads the pretrained ONNX weights from the pinned `demucs` npm package, splits them into 8 MiB static parts and copies the runtime assets. The first visitor separation downloads approximately **166 MiB**; the worker caches it for later runs. Use a laptop with Chrome or Edge and begin with a **10–30 second excerpt**. The web app limits inference input to **30 seconds / 10 MB** to reduce browser memory pressure. Phones and tablets are prevented from starting neural separation before model download because the model can crash mobile renderers. Accounts and the generated demo mixer still work on phones.
 
 Netlify deploys include COOP/COEP response headers for WASM threading. All inference assets are served from the same origin.
 
