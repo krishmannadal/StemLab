@@ -58,3 +58,7 @@ The reported Android Chrome “Aw, Snap!” screen indicates a renderer crash ra
 - Desktop input is limited to 30 seconds / 10 MB. An interrupted-job marker offers recovery guidance after a reload.
 - Six Node tests passed, including mobile/iPad/limited-memory policy checks and sequential model assembly.
 - Chromium desktop test passed actual ONNX inference on a two-second generated input plus account/mixer/export flows. An Android user-agent test confirmed both the picker and direct-upload path trigger no model/worker requests; login and the demo still work. This is browser emulation, not a hardware test on the user's Motorola.
+
+## Individual downloads and added audio tracks / 13 October 2026
+
+Seven Node test cases pass, including correct gain/mute handling and time offsets for added mono audio in stereo remix exports. Browser checks pass: individual Drums WAV contents/header, download-panel navigation, importing a mono vocal clip, gain and delayed-start export (silent before the chosen start), saved audio/settings across reopening, playback, removal persisted across reopening, and mobile layout. No additional neural inference is performed when adding a mixer track.

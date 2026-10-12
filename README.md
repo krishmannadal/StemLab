@@ -10,7 +10,9 @@ The web edition runs pretrained Demucs entirely in the browser using ONNX Runtim
 - Unique email/password accounts, server-side salted scrypt password hashes and opaque cookie sessions.
 - Four-source neural separation in a dedicated browser worker; WASM on desktop browsers with bounded memory settings.
 - Shared-clock mixer, original comparison, practice presets, mute/solo and channel volumes.
-- A–B rehearsal loops, section export, WAV export and source-stem ZIP download.
+- A–B rehearsal loops, section export, individual stem WAV downloads and source-stem ZIP download.
+- A small Download button jumps to the downloads panel. Choose Vocals, Drums, Bass, Other or Download my remix.
+- Add up to three audio tracks (instruments/vocals, up to 30 seconds and 10 MB each). Set volume, mute/solo and a start time from 0–30 seconds; these tracks are included in the remix export. The timeline extends to fit them, and additions persist in the current browser session store.
 - Per-account audio sessions stored in IndexedDB on the current device.
 - Responsive editorial interface inspired by contemporary Godly design references: oversized type, warm paper colours, acid green accents and a vinyl record motif.
 
