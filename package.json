@@ -1,0 +1,1 @@
+{"name":"stemlab-web","version":"2.0.0","private":true,"type":"module","scripts":{"build":"node web/build.mjs","test":"node --test web/tests/*.test.mjs"},"dependencies":{"@netlify/blobs":"11.1.4","demucs":"1.0.0","fflate":"^0.8.2","onnxruntime-web":"1.22.0"},"devDependencies":{"esbuild":"0.25.5"}}

@@ -33,3 +33,13 @@ python prepare_model.py
 ```
 
 Then upload a short real music excerpt, wait for separation, listen to each source and export one practice track before presenting.
+
+## Browser edition / v2
+
+- Production static build passed: browser app, worker, same-origin ONNX Runtime assets and 21 model parts (~166 MiB).
+- Four Node test cases passed: case-normalised unique email registration, hashed password login, secure cookie creation, expiry/logout, wrong-password handling, cross-origin rejection, attempt throttling, stereo WAV headers, gain/crop arithmetic and peak protection.
+- Chromium UI passed against the real account handler with an in-memory test implementation of the Blob interface: signup, login, logout, saved per-account IndexedDB sessions, preset levels, advancing playback, original/loop/export interactions, and mobile layout without horizontal overflow.
+- Actual browser ONNX inference ran on a two-second generated audio input and returned all four sources to the mixer. This checks the neural pipeline, not perceptual accuracy on real music.
+- Desktop/mobile layouts visually inspected. The model-worker transferable buffer handling was corrected after the initial smoke test exposed shared ArrayBuffers.
+
+The live Netlify Blob integration must still be verified after deployment. Local browser checks route static files/account requests through the test harness because this execution environment restricts local socket access. These checks do not establish Netlify deployment success. Chrome's headless WASM path was used here; real-device WebGPU performance was not benchmarked.

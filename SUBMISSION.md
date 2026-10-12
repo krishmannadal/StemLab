@@ -7,7 +7,7 @@
 
 ## Abstract
 
-StemLab is a local application that transforms mixed music into personalised rehearsal material. It applies a pretrained Hybrid Transformer Demucs model to estimate vocals, drums, bass and remaining accompaniment. Users can adjust individual channels, choose practice presets, compare the result with the original recording, repeat a selected section and export a custom backing track. The project combines deep learning inference with an interactive audio interface. It targets singers, musicians and students preparing performances. The underlying separation model is pretrained; the project's contribution is its integrated application and rehearsal workflow.
+StemLab is a browser application that transforms mixed music into personalised rehearsal material. It applies a pretrained Hybrid Transformer Demucs model to estimate vocals, drums, bass and remaining accompaniment. Users can adjust individual channels, choose practice presets, compare the result with the original recording, repeat a selected section and export a custom backing track. The project combines deep learning inference with an interactive audio interface. It targets singers, musicians and students preparing performances. The underlying separation model is pretrained; the project's contribution is its integrated application and rehearsal workflow.
 
 ## Problem and objectives
 
@@ -18,11 +18,11 @@ The objectives are to separate the recording into four estimated sources, provid
 ## Methodology
 
 1. Upload and validate an audio file.
-2. Decode to stereo, 44.1 kHz floating-point WAV using FFmpeg.
+2. Decode to stereo, 44.1 kHz stereo samples using the Web Audio API.
 3. Normalise the waveform using the mean and standard deviation of the mono reference.
-4. Apply pretrained `htdemucs` with segmented inference and overlapping segments.
-5. Restore amplitude scaling and save vocals, drums, bass and other as aligned float WAV files.
-6. Decode the sources into browser audio buffers and start all channels on a shared Web Audio clock.
+4. Apply pretrained `htdemucs` (ONNX browser edition) with segmented inference and overlapping segments.
+5. Restore amplitude scaling and return aligned vocals, drums, bass and other samples to the browser.
+6. Place the sources in browser audio buffers and start all channels on a shared Web Audio clock.
 7. Apply user-selected channel gains, mute/solo and presets.
 8. Export the weighted sum of the stems, optionally restricted to an A–B section.
 
@@ -39,6 +39,10 @@ Think of the mixed song as several people speaking at once. You hear only the co
 Hybrid Transformer Demucs works with both the waveform and a time-frequency representation. Its encoder/decoder structure extracts and reconstructs audio features; transformer layers connect information across time and across the two representations. It predicts source signals rather than simply classifying the track.
 
 The model was trained by its authors. StemLab performs inference on uploaded music. No new training or fine-tuning is claimed.
+
+## Web deployment and accounts
+
+Netlify serves the application and account Functions. Each email is atomically assigned one account; password hashes are salted with scrypt and authenticated sessions use secure HttpOnly cookies. The deep learning model runs on the visitor’s device, using ONNX Runtime Web. Audio sessions are stored per account in local IndexedDB, while account records persist online. Login on another device restores the account but does not transfer audio.
 
 ## Features and original application contribution
 
@@ -68,7 +72,7 @@ Prepare one real separated excerpt before presenting so model download and proce
 
 ## Viva questions
 
-**Where is deep learning used?** In `worker.py`, where the pretrained Demucs neural network estimates four source waveforms.
+**Where is deep learning used?** In `web/src/separator.mjs`, where ONNX Runtime Web applies the pretrained Demucs model to estimate four sources. The original Python worker is retained as a local alternative.
 
 **Did you train the model?** No. I used pretrained weights. The implementation contribution is the application and rehearsal pipeline.
 

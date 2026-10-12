@@ -3,3 +3,9 @@ __pycache__/
 .pytest_cache/
 data/
 *.pyc
+
+node_modules/
+dist/
+.netlify/
+.env
+.env.*

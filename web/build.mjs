@@ -1,0 +1,13 @@
+import {build} from 'esbuild';
+import {mkdir,rm,copyFile,readFile,writeFile,readdir} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root=path.dirname(path.dirname(fileURLToPath(import.meta.url))),out=path.join(root,'dist');
+await rm(out,{recursive:true,force:true});await mkdir(path.join(out,'model'),{recursive:true});
+await build({entryPoints:[path.join(root,'web/src/studio.mjs')],bundle:true,format:'iife',outfile:path.join(out,'app.js'),minify:true,target:'es2022'});
+await build({entryPoints:[path.join(root,'web/src/separator.mjs')],bundle:true,format:'iife',outfile:path.join(out,'separator.js'),minify:true,target:'es2022',alias:{'onnxruntime-node':'onnxruntime-web/webgpu'}});
+for(const file of ['index.html','style.css'])await copyFile(path.join(root,'web/src',file),path.join(out,file));
+const ortDir=path.join(root,'node_modules/onnxruntime-web/dist');for(const file of await readdir(ortDir))if(/\.wasm$|\.mjs$/.test(file))await copyFile(path.join(ortDir,file),path.join(out,file));
+const weights=await readFile(path.join(root,'node_modules/demucs/htdemucs.onnx')),parts=[];for(let pos=0,i=0;pos<weights.length;pos+=8*1024*1024,i++){const name=`part-${String(i).padStart(2,'0')}.bin`;await writeFile(path.join(out,'model',name),weights.subarray(pos,pos+8*1024*1024));parts.push(name)}await writeFile(path.join(out,'model/manifest.json'),JSON.stringify({bytes:weights.length,parts}));
+await copyFile(path.join(root,'node_modules/demucs/LICENSE.md'),path.join(out,'demucs-license.txt'));
+console.log('StemLab web build complete. Model:',Math.round(weights.length/1024/1024),'MiB in',parts.length,'parts.');
