@@ -71,3 +71,9 @@ Seven Node test cases pass, including correct gain/mute handling and time offset
   original samples. Expanded controls fit a 390px viewport without overflow.
 - Existing added-track import, offsets, gain export, playback and removal pass.
 - No neural-model changes or new separation benchmark claims in this update.
+
+## Gemini chat validation
+- Eight Node tests pass, including authenticated chat, origin/history validation,
+  missing-key response, API request format and per-user request throttling.
+- Headless Chromium: open/send/reply, safe text rendering, clear, close, Escape
+  and 390px mobile layout pass. Gemini replies mocked; no live key available.

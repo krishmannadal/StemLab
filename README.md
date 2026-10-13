@@ -86,3 +86,17 @@ The prompt assistant matches built-in style keywords (bright, warm, smooth,
 punchy, vintage, radio, reverb, dry). It is a rule-based preset selector, not an
 LLM or audio generation model. Artist references suggest a general treatment,
 not voice cloning. Pitch correction and voice identity conversion are not provided.
+
+### Gemini studio chat setup
+The corner **Ask StemLab** button opens a text-only Gemini assistant. Chat requires
+an account and is limited to six requests per minute and forty per day per user.
+Only typed chat text and recent chat history are sent to Google; audio is never
+attached. The assistant suggests settings but does not operate the mixer. History
+is in memory, cleared on account changes, and not saved to the session database.
+
+In Netlify → Project configuration → Environment variables, add `GEMINI_API_KEY`
+with Functions scope, then trigger a fresh production deploy. Do not put the key
+in browser code or GitHub. Optional `GEMINI_MODEL` overrides the default
+`gemini-3.5-flash-lite`. Availability and quota depend on the Google account.
+Without a key, chat shows a configuration message. Gemini live responses have not
+been verified until a real key is configured; API wiring is tested using mocks.
