@@ -77,3 +77,10 @@ Seven Node test cases pass, including correct gain/mute handling and time offset
   missing-key response, API request format and per-user request throttling.
 - Headless Chromium: open/send/reply, safe text rendering, clear, close, Escape
   and 390px mobile layout pass. Gemini replies mocked; no live key available.
+
+## Tune coach refinement
+- Chat moved to left with an 85–90px bottom inset to separate it from hosting UI.
+- Desktop/mobile open, send, clear and close checks pass; mobile layout visually
+  inspected and composer corrected to retain a usable textarea beside Send.
+- Server request test confirms the artist-reference context is included. It uses
+  supported effect ranges and distinguishes tonal treatment from voice conversion.
