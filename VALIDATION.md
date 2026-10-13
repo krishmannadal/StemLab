@@ -62,3 +62,12 @@ The reported Android Chrome “Aw, Snap!” screen indicates a renderer crash ra
 ## Individual downloads and added audio tracks / 13 October 2026
 
 Seven Node test cases pass, including correct gain/mute handling and time offsets for added mono audio in stereo remix exports. Browser checks pass: individual Drums WAV contents/header, download-panel navigation, importing a mono vocal clip, gain and delayed-start export (silent before the chosen start), saved audio/settings across reopening, playback, removal persisted across reopening, and mobile layout. No additional neural inference is performed when adding a mixer track.
+
+## Per-track tuning validation
+- Production build and all seven existing Node tests pass.
+- Headless Chromium: prompt mapping changes sliders; Apply produces changed WAV
+  samples; a solo tuned track matches the rendered remix WAV exactly.
+- Saved/reopened effects reproduce identical processed samples; Reset restores
+  original samples. Expanded controls fit a 390px viewport without overflow.
+- Existing added-track import, offsets, gain export, playback and removal pass.
+- No neural-model changes or new separation benchmark claims in this update.

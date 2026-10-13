@@ -73,3 +73,16 @@ The generated demo has known synthetic sources and tests the mixer; it is not a 
 ## Original Python edition
 
 The original local Python/FastAPI edition remains available via `start_windows.bat` and `run.py`. Its setup guide is in `LOCAL_SETUP.md`. Netlify builds the browser edition from `web/`; it does not run those Python files.
+
+### Track tuning and local prompt suggestions
+Every original or imported track has a **Tune** disclosure with bass, presence,
+air, compression, room reverb and stereo position controls. Apply renders effects
+locally using Web Audio; playback, individual WAV downloads and remix export use
+the same processed audio. Reset restores the unprocessed track. Save mix persists
+effect settings; reopening re-renders from the original audio. The original-stems
+ZIP remains unprocessed. Reverb is cropped to the track's duration.
+
+The prompt assistant matches built-in style keywords (bright, warm, smooth,
+punchy, vintage, radio, reverb, dry). It is a rule-based preset selector, not an
+LLM or audio generation model. Artist references suggest a general treatment,
+not voice cloning. Pitch correction and voice identity conversion are not provided.
