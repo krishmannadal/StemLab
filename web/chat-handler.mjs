@@ -22,7 +22,7 @@ export function createChatHandler(storeFor,{env=process.env,fetcher=fetch,now=()
    let input;try{input=JSON.parse(text)}catch{return reply({error:'Invalid request'},400)}
    if(input?.action==='check')return reply(await gemini.check());
    const messages=input?.messages;if(!Array.isArray(messages)||!messages.length||messages.length>12||messages.at(-1)?.role!=='user'||messages.some((m,i)=>m.role!==(i%2?'model':'user')||typeof m.text!=='string'||!m.text.trim()||m.text.length>1200))return reply({error:'Use a message of 1–1200 characters and a valid conversation.'},400);
-   if(!env.GEMINI_API_KEY?.trim())throw new GeminiError('KEY_MISSING','Add GEMINI_API_KEY in Netlify with Functions scope, then redeploy to enable Gemini.',503);
+   if(!env.GEMINI_API_KEY?.trim()&&!env.steamlab?.trim())throw new GeminiError('KEY_MISSING','Add GEMINI_API_KEY in Netlify with Functions scope, then redeploy to enable Gemini.',503);
    const limits=storeFor('stemlab-chat-rate');for(const [duration,max,label] of [[60000,6,'minute'],[86400000,40,'day']]){const key=digest(user.id+':'+duration+':'+Math.floor(now()/duration));let allowed=false;for(let i=0;i<5;i++){const old=await limits.getWithMetadata(key,{type:'json'});const count=old?.data?.count||0;if(count>=max)return reply({error:`Chat limit reached. Please try again next ${label}.`},429);const result=await limits.setJSON(key,{count:count+1},{...(old?{onlyIfMatch:old.etag}:{onlyIfNew:true})});if(result.modified){allowed=true;break}}if(!allowed)return reply({error:'Chat is busy. Try again shortly.'},429)}
    const track=['vocals','drums','bass','other'].includes(input.track)?input.track:'selected';
    return reply(await gemini.generate(system,messages,{track,currentSettings:cleanSettings(input.currentSettings)}));

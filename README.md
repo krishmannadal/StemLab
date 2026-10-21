@@ -120,3 +120,8 @@ a Gemini answer. No voice cloning or pitch correction is added.
 If chat reports a model error, remove `GEMINI_MODEL` and redeploy. If it reports
 key/access errors, update `GEMINI_API_KEY` in the Netlify server environment and
 check Google AI Studio restrictions. Never paste credentials into the app or git.
+
+The existing Netlify variable `steamlab` is accepted as a compatibility alias for
+`GEMINI_API_KEY`. If Google rejects the canonical key as invalid, the configured
+alias is tried once. Permission and quota failures do not trigger key fallback.
+Key values remain server-side and are not returned by diagnostics.
