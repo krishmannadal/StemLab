@@ -1,0 +1,79 @@
+[
+  {
+    "model": "basic_rnn",
+    "file": "config.json",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/basic_rnn/config.json",
+    "sha256": "fc8928dc067148eab3d50e8028b35b511038283d1fe58c2804b24926a8038ec1",
+    "bytes": 131
+  },
+  {
+    "model": "basic_rnn",
+    "file": "weights_manifest.json",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/basic_rnn/weights_manifest.json",
+    "sha256": "cb91dce0a07cf2d735e20d2d776fa3449de19e33dd1a2a498c74f4bb8fb61470",
+    "bytes": 657
+  },
+  {
+    "model": "basic_rnn",
+    "file": "group1-shard1of4",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/basic_rnn/group1-shard1of4",
+    "sha256": "f4b8281261c2914f549fbe9ff5ad46e6c007a5d05f6438dc7ba120734243126e",
+    "bytes": 4194304
+  },
+  {
+    "model": "basic_rnn",
+    "file": "group1-shard2of4",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/basic_rnn/group1-shard2of4",
+    "sha256": "d12d50840e8e34110b700681b0f7d0a2c96985307b0366b5ac60b73d571c41a1",
+    "bytes": 4194304
+  },
+  {
+    "model": "basic_rnn",
+    "file": "group1-shard3of4",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/basic_rnn/group1-shard3of4",
+    "sha256": "f40e868468254c659f7cf5300cadbe3dfb061fc5c3724a2ddd9bd490831d73a8",
+    "bytes": 4194304
+  },
+  {
+    "model": "basic_rnn",
+    "file": "group1-shard4of4",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/basic_rnn/group1-shard4of4",
+    "sha256": "2e5b152a75bc30ba0e4d38175ab307568265f1862e0cdad70d2b9eab521f4281",
+    "bytes": 405656
+  },
+  {
+    "model": "drum_kit_rnn",
+    "file": "config.json",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/drum_kit_rnn/config.json",
+    "sha256": "29da526d5830344bb6b9cbad6a506671fc01cf183fda353116bec0ba209fa041",
+    "bytes": 237
+  },
+  {
+    "model": "drum_kit_rnn",
+    "file": "weights_manifest.json",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/drum_kit_rnn/weights_manifest.json",
+    "sha256": "3f64e0300de500d59b74cb33d7c009dc6630491885d90dbaf93fa422e0798764",
+    "bytes": 1758
+  },
+  {
+    "model": "drum_kit_rnn",
+    "file": "group1-shard1of3",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/drum_kit_rnn/group1-shard1of3",
+    "sha256": "b822cab0c4913db6f0e6a69e33bd82f0a832a0e18e5d2e22d8a0f676b3c668f0",
+    "bytes": 4194304
+  },
+  {
+    "model": "drum_kit_rnn",
+    "file": "group1-shard2of3",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/drum_kit_rnn/group1-shard2of3",
+    "sha256": "2e211975ea0d68b07c63faffd0e990bd9fb0f57c3260a1c32f19935826708c82",
+    "bytes": 4194304
+  },
+  {
+    "model": "drum_kit_rnn",
+    "file": "group1-shard3of3",
+    "url": "https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/drum_kit_rnn/group1-shard3of3",
+    "sha256": "024cd22e7f0ed9777599027b399ce330607c920c4e22057586f3a9b2f5706ee9",
+    "bytes": 3482792
+  }
+]

@@ -125,3 +125,32 @@ The existing Netlify variable `steamlab` is accepted as a compatibility alias fo
 `GEMINI_API_KEY`. If Google rejects the canonical key as invalid, the configured
 alias is tried once. Permission and quota failures do not trigger key fallback.
 Key values remain server-side and are not returned by diagnostics.
+
+### Free local AI instrument composer
+Open an active session and choose **Generate part**. The app estimates constant
+BPM and a beat-grid offset from that session's unprocessed drum stem. Both values
+are editable; silent/unclear input is explicitly marked uncertain. This is an
+onset-envelope/autocorrelation estimate, not neural beat tracking or downbeat,
+time-signature, chord or key recognition. The grid assumes 4/4. Choose melodic key
+and scale by ear; tempo/phase can be ambiguous or drift on variable-tempo music.
+
+Generation uses **Magenta MusicRNN**, with `drum_kit_rnn` for drums and `basic_rnn`
+(MelodyRNN) for flute, bass and keys. A small quantized seed is conditioned on the
+estimated grid; a pretrained recurrent model composes a 1–4 bar phrase. The phrase
+is rendered by a local synthesizer, optionally repeated to fill up to 30 seconds.
+These are synthesized instrument sounds, not realistic studio recordings or a
+full-song text-to-music model. No Gemini request, generation API fee or extra key
+is involved; the user's CPU and existing metered hosting bandwidth are still used.
+
+The generator lazily loads a 1.3 MB worker plus approximately 12 MB of model weights
+for the selected model family. Assets are self-hosted; the build checks pinned
+SHA-256 hashes against official hosted Magenta checkpoints. No recordings leave
+the device. Generation can be cancelled, and workers are released after a result.
+Preview the part, then **Add to this remix**. Generated tracks share the existing
+three-added-track limit, gain/tuning/mute/solo, start offsets, saved sessions and
+WAV/remix downloads. Changing sessions discards an unattached preview.
+
+Credits: Google Magenta and contributors, Apache-2.0 code.
+- https://github.com/magenta/magenta-js
+- https://github.com/magenta/magenta-js/blob/master/music/checkpoints/README.md
+- License is included in `web/composer-license.txt` and the deployed asset credits.

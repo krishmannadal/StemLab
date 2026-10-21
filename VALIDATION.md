@@ -95,3 +95,16 @@ Seven Node test cases pass, including correct gain/mute handling and time offset
 - Mobile expanded coach visually reviewed at 390px; no horizontal overflow.
 - Provider responses are mocked in development. A real configured key and a live
   generation response remain required to verify Google integration end to end.
+
+## Free local AI composer / 21 October 2026
+- Fifteen Node tests pass, including tempo/phase detection on known 90/120/150 BPM
+  clicks, silence uncertainty, quantized seeds, scale-constrained repeated notes,
+  on-grid placement and bounded synthesized samples for four instruments.
+- Chromium ran actual pretrained DrumsRNN (4 bars/8 seconds at 120 BPM) and
+  MelodyRNN (1 bar/2 seconds), using self-hosted weights and the CPU backend.
+- The active demo's estimated BPM was 120. Generated WAVs contained nonzero stereo
+  audio, saved/reopened as added tracks, and contributed to remix exports.
+- Generation cancellation, shared mixer playback and 390px layout checks pass.
+  The expanded generator was visually inspected. The coach regression passes.
+- These are functional checks, not an assessment of musical quality, instrument
+  realism, polyphonic harmony following or real-phone inference performance.
