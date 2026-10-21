@@ -84,3 +84,14 @@ Seven Node test cases pass, including correct gain/mute handling and time offset
   inspected and composer corrected to retain a usable textarea beside Send.
 - Server request test confirms the artist-reference context is included. It uses
   supported effect ranges and distinguishes tonal treatment from voice conversion.
+
+## Connected coach repair / 21 October 2026
+- Eleven Node cases pass, including Flash-model discovery/cache, structured
+  response values, rejection of invalid recommendations and safe provider error
+  classification. Removed hard-coded model default and sampling temperature.
+- Chromium: per-stem Ask tune coach, six returned values, Apply tuning/playback,
+  changed vocal WAV, saved/reopened byte-identical WAV, drum targeting, connection
+  check, visibly labelled local fallback and stale-session rejection pass.
+- Mobile expanded coach visually reviewed at 390px; no horizontal overflow.
+- Provider responses are mocked in development. A real configured key and a live
+  generation response remain required to verify Google integration end to end.

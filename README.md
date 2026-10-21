@@ -88,7 +88,7 @@ LLM or audio generation model. Artist references suggest a general treatment,
 not voice cloning. Pitch correction and voice identity conversion are not provided.
 
 ### Gemini studio chat setup
-The corner **Ask StemLab** button opens a text-only Gemini assistant. Chat requires
+The corner **Tune coach** button opens a text-only Gemini assistant. Chat requires
 an account and is limited to six requests per minute and forty per day per user.
 Only typed chat text and recent chat history are sent to Google; audio is never
 attached. The assistant suggests settings but does not operate the mixer. History
@@ -96,7 +96,27 @@ is in memory, cleared on account changes, and not saved to the session database.
 
 In Netlify → Project configuration → Environment variables, add `GEMINI_API_KEY`
 with Functions scope, then trigger a fresh production deploy. Do not put the key
-in browser code or GitHub. Optional `GEMINI_MODEL` overrides the default
-`gemini-3.5-flash-lite`. Availability and quota depend on the Google account.
+in browser code or GitHub. Leave `GEMINI_MODEL` unset to discover a compatible Flash model automatically.
+An optional `GEMINI_MODEL` can pin a model available to your key. Availability and quota depend on the Google account.
 Without a key, chat shows a configuration message. Gemini live responses have not
 been verified until a real key is configured; API wiring is tested using mocks.
+
+
+### Connected tuning workflow (21 October 2026)
+Open **Tune coach**, select a stem, and describe the desired sound. The coach
+returns validated values for all six controls and an **Apply tuning** button.
+This renders the selected track locally and updates its sliders; save the mix
+to preserve settings. **Ask tune coach** in each track opens the same workflow.
+Suggestions are bound to the current session to prevent applying an old card to
+a different recording. Imported tracks can also be selected.
+
+**Check connection** verifies server key/model access without generating audio or
+text; successful model access does not guarantee remaining generation quota.
+Errors distinguish missing/rejected keys, restrictions, unavailable models and
+quota. If generation fails, supported descriptions offer a separately labelled
+**Local preset (offline)**. That fallback is rule-based and is never presented as
+a Gemini answer. No voice cloning or pitch correction is added.
+
+If chat reports a model error, remove `GEMINI_MODEL` and redeploy. If it reports
+key/access errors, update `GEMINI_API_KEY` in the Netlify server environment and
+check Google AI Studio restrictions. Never paste credentials into the app or git.
