@@ -76,7 +76,7 @@ The original local Python/FastAPI edition remains available via `start_windows.b
 
 ### Track tuning and local prompt suggestions
 Every original or imported track has a **Tune** disclosure with bass, presence,
-air, compression, room reverb and stereo position controls. Apply renders effects
+air, compression, room reverb, stereo position, pitch and independent formant controls. Apply renders effects
 locally using Web Audio; playback, individual WAV downloads and remix export use
 the same processed audio. Reset restores the unprocessed track. Save mix persists
 effect settings; reopening re-renders from the original audio. The original-stems
@@ -98,13 +98,14 @@ In Netlify → Project configuration → Environment variables, add `GEMINI_API_
 with Functions scope, then trigger a fresh production deploy. Do not put the key
 in browser code or GitHub. Leave `GEMINI_MODEL` unset to discover a compatible Flash model automatically.
 An optional `GEMINI_MODEL` can pin a model available to your key. Availability and quota depend on the Google account.
-Without a key, chat shows a configuration message. Gemini live responses have not
-been verified until a real key is configured; API wiring is tested using mocks.
+Without a key, general Gemini chat shows a configuration message. A prior production
+connection and structured response were verified with the configured server key;
+ongoing availability depends on provider quota. Local voice transformations do not use it.
 
 
 ### Connected tuning workflow (21 October 2026)
 Open **Tune coach**, select a stem, and describe the desired sound. The coach
-returns validated values for all six controls and an **Apply tuning** button.
+returns validated values for all eight controls and an **Apply tuning** button.
 This renders the selected track locally and updates its sliders; save the mix
 to preserve settings. **Ask tune coach** in each track opens the same workflow.
 Suggestions are bound to the current session to prevent applying an old card to
@@ -154,3 +155,22 @@ Credits: Google Magenta and contributors, Apache-2.0 code.
 - https://github.com/magenta/magenta-js
 - https://github.com/magenta/magenta-js/blob/master/music/checkpoints/README.md
 - License is included in `web/composer-license.txt` and the deployed asset credits.
+
+### Vocal transformation / 22 October 2026
+**Tune Vocals** now has Feminine voice, Masculine voice and Lighter voice (same
+notes) presets. Pitch shifts notes from -12 to +12 semitones, while formants
+shift vocal resonance independently from -8 to +8 semitones. Both use 0.5 steps.
+Signalsmith Stretch 1.3.2 (MIT) renders through a local WASM AudioWorklet at rate 1;
+the resulting buffer has the original duration and is used for playback, stem
+downloads and remix export. Save mix stores settings; reopening renders raw audio
+again. Reset effects restores the original stem. HTTPS and AudioWorklet support
+are required. The versioned processor is lazy-loaded from this site.
+
+A request such as **change vocals to female** offers a labelled local vocal
+transformation immediately, without an API call or key. Its starting point is
+pitch +5 and formant +3 semitones; masculine uses -4 and -2. Apply the card to hear
+it. Select the vocal track and use Solo to compare it clearly. For an unchanged
+melody, choose Lighter voice or set pitch to 0. Pitch changes the key relative to
+backing instruments. Adjust by ear: DSP does not guarantee a natural female/male
+perception or clone any singer. General Gemini recommendations also understand
+the new controls. The effect is signal processing, not a newly trained AI model.

@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createGemini,parseReply} from '../gemini.mjs';
-const settings={low:-2,mid:2,high:3,compression:25,reverb:14,pan:0};
+const settings={low:-2,mid:2,high:3,compression:25,reverb:14,pan:0,pitch:0,formant:0};
 test('discover and cache an available Flash model, send structured settings and no deprecated sampling parameter',async()=>{
  let lists=0,requests=0;const client=createGemini({env:{GEMINI_API_KEY:'never-return-me'},fetcher:async(url,options)=>{assert.equal(options.headers['x-goog-api-key'],'never-return-me');if(url.includes('/models?')){lists++;return Response.json({models:[{name:'models/gemini-test-flash-lite',supportedGenerationMethods:['generateContent']},{name:'models/gemini-test-image-flash',supportedGenerationMethods:['generateContent']}]})}if(options.method){requests++;const body=JSON.parse(options.body);assert.equal(body.generationConfig.temperature,undefined);assert.equal(body.generationConfig.responseMimeType,'application/json');assert.match(body.systemInstruction.parts[0].text,/drums/);return Response.json({candidates:[{content:{parts:[{text:JSON.stringify({answer:'Try these settings.',suggestion:{settings}})}]}}]})}return Response.json({name:'models/gemini-test-flash-lite'})}});
  assert.equal((await client.check()).status,'connected');for(let i=0;i<2;i++){const r=await client.generate('Tune', [{role:'user',text:'warm'}],{track:'drums'});assert.deepEqual(r.suggestion.settings,settings);assert.equal(r.model,'gemini-test-flash-lite')}assert.equal(lists,1);assert.equal(requests,2);
@@ -16,3 +16,10 @@ test('supports project key variable and replaces a rejected old key without logg
  assert.equal((await client.check()).status,'connected');assert.equal((await client.check()).status,'connected');assert.deepEqual(calls,['old-key','new-key','new-key','new-key']);
  const aliasOnly=createGemini({env:{steamlab:'new-key',GEMINI_MODEL:'gemini-test-flash'},fetcher:async(url,options)=>{assert.equal(options.headers['x-goog-api-key'],'new-key');return Response.json({name:'models/gemini-test-flash'})}});assert.equal((await aliasOnly.check()).status,'connected');
 });
+
+ test('pitch and formant recommendations retain half-semitones and reject unsafe values',()=>{
+ const reply=v=>JSON.stringify({answer:'Try this voice treatment.',suggestion:{settings:{...settings,...v}}});
+ assert.equal(parseReply(reply({pitch:4.5,formant:2.5})).suggestion.settings.pitch,4.5);
+ assert.equal(parseReply(reply({pitch:4.5,formant:2.5})).suggestion.settings.formant,2.5);
+ for(const invalid of [{pitch:13},{formant:-9},{pitch:'5'},{formant:null}])assert.throws(()=>parseReply(reply(invalid)));
+ });

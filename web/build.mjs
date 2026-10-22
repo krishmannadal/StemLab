@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 const root=path.dirname(path.dirname(fileURLToPath(import.meta.url))),out=path.join(root,'dist');
 await rm(out,{recursive:true,force:true});await mkdir(path.join(out,'model'),{recursive:true});
-await build({entryPoints:[path.join(root,'web/src/studio.mjs')],bundle:true,format:'iife',outfile:path.join(out,'app.js'),minify:true,target:'es2022'});
+await build({entryPoints:[path.join(root,'web/src/studio.mjs')],bundle:true,format:'iife',outfile:path.join(out,'app.js'),minify:true,target:'es2022',external:['/voice/*']});
 await build({entryPoints:[path.join(root,'web/src/separator.mjs')],bundle:true,format:'iife',outfile:path.join(out,'separator.js'),minify:true,target:'es2022',alias:{'onnxruntime-node':'onnxruntime-web/webgpu'}});
 await build({entryPoints:[path.join(root,'web/src/composer-worker.mjs')],bundle:true,format:'iife',outfile:path.join(out,'composer.js'),minify:true,target:'es2022'});
 for(const file of ['index.html','style.css'])await copyFile(path.join(root,'web/src',file),path.join(out,file));
@@ -25,3 +25,6 @@ await writeFile(path.join(out,'composer-credits.txt'),'Magenta.js / MusicRNN by 
 console.log('Local composer assets packaged:',composerAssets.length,'files.');
 
 await copyFile(path.join(root,'web/composer-license.txt'),path.join(out,'composer-license.txt'));
+await mkdir(path.join(out,'voice'),{recursive:true});
+await copyFile(path.join(root,'node_modules/signalsmith-stretch/SignalsmithStretch.mjs'),path.join(out,'voice/SignalsmithStretch-1.3.2.mjs'));
+await copyFile(path.join(root,'web/voice-license.txt'),path.join(out,'voice-license.txt'));

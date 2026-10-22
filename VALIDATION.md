@@ -108,3 +108,18 @@ Seven Node test cases pass, including correct gain/mute handling and time offset
   The expanded generator was visually inspected. The coach regression passes.
 - These are functional checks, not an assessment of musical quality, instrument
   realism, polyphonic harmony following or real-phone inference performance.
+
+## Vocal pitch/formant transformation / 22 October 2026
+- Eighteen Node tests pass. New coverage checks destination parsing (including
+  female-to-male and same-pitch requests), legacy mixes, bounded finite settings,
+  half-semitone recommendations and invalid pitch/formant rejection.
+- Actual Signalsmith Stretch WASM in Chromium shifts a 120 Hz tone upward with
+  +5 semitones and downward with -4, while preserving all 132300 samples of a
+  3-second clip. Formant-only processing retains the 120 Hz note.
+- Browser integration uses a female-voice prompt without any Gemini request,
+  renders pitch +5/formant +3, produces a changed nonzero WAV of unchanged length,
+  saves/reopens the settings and restores the raw WAV on Reset. Masculine and
+  same-note presets also exercise the actual processor. Mobile controls were
+  visually reviewed at 390px with no horizontal overflow.
+- No perceptual listening study or guarantee of natural gender presentation.
+  This is local DSP, not voice cloning or automatic pitch correction.
