@@ -1,176 +1,117 @@
-# StemLab — Make room for your sound.
+# StemLab
+### Turn a song into a rehearsal workspace
 
-**Browser music separation and rehearsal studio**  
-Krishnakumar Mandal · SFIT AIML
+StemLab is a browser music studio for learners and musicians who want to isolate a part, practise a section and export a backing mix. It integrates **pretrained Demucs** for four-source separation with a shared-clock Web Audio mixer, effects and downloads.
 
-The web edition runs pretrained Demucs entirely in the browser using ONNX Runtime Web. Netlify hosts the static application, email/password account Functions and persistent account records in Netlify Blobs. No Python server, paid inference API or GPU hosting service is required for this edition.
+[Open the deployed site](https://stemlab-krishmannadal.netlify.app/) · [Local Python edition](LOCAL_SETUP.md) · [Recorded validation history](VALIDATION.md)
 
-## Web features
+![Actual deployed StemLab landing page](docs/assets/landing.jpg)
+*Public landing page captured during the 23 October 2026 audit. This image shows the interface, not a separation result.*
 
-- Unique email/password accounts, server-side salted scrypt password hashes and opaque cookie sessions.
-- Four-source neural separation in a dedicated browser worker; WASM on desktop browsers with bounded memory settings.
-- Shared-clock mixer, original comparison, practice presets, mute/solo and channel volumes.
-- A–B rehearsal loops, section export, individual stem WAV downloads and source-stem ZIP download.
-- A small Download button jumps to the downloads panel. Choose Vocals, Drums, Bass, Other or Download my remix.
-- Add up to three audio tracks (instruments/vocals, up to 30 seconds and 10 MB each). Set volume, mute/solo and a start time from 0–30 seconds; these tracks are included in the remix export. The timeline extends to fit them, and additions persist in the current browser session store.
-- Per-account audio sessions stored in IndexedDB on the current device.
-- Responsive editorial interface inspired by contemporary Godly design references: oversized type, warm paper colours, acid green accents and a vinyl record motif.
+**Status:** application prototype; desktop browser inference. This project integrates existing models—it does not train a new separation, composition or voice model.
 
-Account records persist across deployments. Audio is processed and saved locally in the browser: logging in on a different device does not transfer audio sessions. Clearing browser site storage removes local audio. Email verification and password recovery are not implemented in this basic account system; a signup does not verify ownership of the email address.
+## What you can inspect
 
-## Deploy to Netlify
+| Capability | Implemented in current source | Verification boundary |
+| --- | --- | --- |
+| Email/password accounts | Netlify Functions + Blobs; cookie sessions | Landing and account gate observed live; authentication not tested in this audit |
+| Four stems | Demucs ONNX worker: vocals, drums, bass, other | Source/build checked; historical browser smoke tests in VALIDATION.md; not rerun on production |
+| Rehearsal mixer | Shared playback clock, gain, mute/solo, presets, A–B loops | Export arithmetic tested locally; production account session not exercised |
+| Downloads & additions | Stem WAVs, raw-source ZIP, remix/section WAV; up to three added tracks | Local automated tests cover gains, crops and added-track offsets |
+| Per-track effects | EQ, compression, reverb, pan; pitch and independent formants | Settings/parser tests pass; perceptual voice quality not established |
+| Instrument composer | Pretrained Magenta MusicRNN plus local synthesis | Source and packaged weights checked; current production generation not exercised |
+| Tune coach | Gemini text suggestions with validated controls and Apply | Provider calls mocked in local tests; current key/quota not verified |
 
-Import this GitHub repository into Netlify. The root `netlify.toml` configures everything:
+**Audit verification, 23 October 2026:** `npm ci`, `npm run build` and **18/18 Node tests** passed in a clean clone. The live landing page loaded and “Explore a synthetic demo” opened account creation. No account was created or authenticated, so this audit does not certify end-to-end production studio behavior. [VALIDATION.md](VALIDATION.md) contains earlier developer checks; those are recorded evidence, separate from this refresh.
 
-- Build: `npm run build`
-- Publish directory: `dist`
-- Functions: `netlify/functions`
-- Node: 22
+## Try it
 
-Choose the **Free** plan. No database credentials or model API keys are required. Functions receive Netlify Blobs credentials from the platform. The project uses metered hosting bandwidth/requests/Functions within Netlify's plan limits; it is not unlimited hosting.
+1. Open the site in desktop Chrome or Edge. Sign in/create an account.
+2. Start with **Explore a synthetic demo** to inspect the mixer. Its known generated sources are **not** a neural separation result.
+3. For actual separation, choose a music clip **up to 30 seconds / 10 MB**. The first use downloads about **166 MiB** of model data.
+4. Solo a source, choose a practice preset, or set a loop. Download a stem or your mix.
+5. Optional: tune a track, add audio, or use Generate part. Preview before adding generated audio to the remix.
 
-The build downloads the pretrained ONNX weights from the pinned `demucs` npm package, splits them into 8 MiB static parts and copies the runtime assets. The first visitor separation downloads approximately **166 MiB**; the worker caches it for later runs. Use a laptop with Chrome or Edge and begin with a **10–30 second excerpt**. The web app limits inference input to **30 seconds / 10 MB** to reduce browser memory pressure. Phones and tablets are prevented from starting neural separation before model download because the model can crash mobile renderers. Accounts and the generated demo mixer still work on phones.
-
-Netlify deploys include COOP/COEP response headers for WASM threading. All inference assets are served from the same origin.
-
-## Build and test
-
-```bash
-npm ci
-npm run build
-npm test
-```
-
-`npm ci` uses `.npmrc` to skip lifecycle scripts: the native Node ONNX runtime is unnecessary for browser inference. esbuild uses its installed platform binary. This prevents downloading an unused native inference engine.
-
-For full local account testing, use Netlify CLI (`npx netlify dev`) in your own environment. Opening `dist/index.html` as a `file://` document does not provide Function endpoints or the cross-origin isolation headers. Static preview alone can demonstrate layout, but cannot authenticate users.
+Mobile/tablet and low-memory devices are blocked from neural separation to reduce renderer crashes. The account UI and synthetic mixer are designed for mobile use; real-device performance was not checked in this audit.
 
 ## Architecture
 
+```mermaid
+flowchart TD
+  A[Browser audio] --> W[Separation worker]
+  W --> D[Pretrained Demucs ONNX]
+  D --> M[Web Audio mixer]
+  G[MusicRNN and local synth] --> M
+  M --> E[WAV and ZIP export]
+  M <--> I[IndexedDB on this device]
+  U[Account UI] --> F[Netlify Functions]
+  F --> B[Netlify Blobs]
+  C[Typed coach messages] --> F
+  F --> P[Gemini API]
 ```
-Browser UI → Netlify Function → Netlify Blobs (accounts / sessions)
-Browser audio file → Web Worker → Demucs ONNX → aligned sources
-Aligned sources → Web Audio mixer → WAV / ZIP export
-IndexedDB → per-account audio sessions on this device
+
+Audio processing stays on the device in the web edition. Typed chat/history goes to Gemini through the server. Accounts persist online; audio sessions remain in IndexedDB on the current browser/device and do not sync between devices.
+
+**Verified stack:** JavaScript ES modules, ONNX Runtime Web, `demucs`, Web Audio, `@magenta/music`, Signalsmith Stretch WASM, `fflate`, esbuild, Netlify Functions and Blobs. See [package.json](package.json) and [web/src/](web/src/).
+
+## Build and run locally
+
+Node **22** is the deployment configuration in [netlify.toml](netlify.toml).
+
+```bash
+git clone https://github.com/krishmannadal/StemLab.git
+cd StemLab
+npm ci
+npm test
+npm run build
+npx netlify dev
 ```
 
-`web/src/` contains the browser source. `web/build.mjs` bundles it and packages static model assets. `web/auth.mjs` contains account logic; `netlify/functions/account.mjs` wires it to the real Blob store. Backend passwords never appear in API responses or browser storage. Cookies are HttpOnly, Secure and SameSite=Strict. Mutating account requests require the same Origin; account attempts use atomic per-IP rate buckets.
+Use the URL printed by Netlify CLI (normally `http://localhost:8888`). Full account testing needs a linked/configured Netlify project and its Blobs context; that integration was not exercised here. Opening `dist/index.html` directly does not provide Functions or cross-origin isolation headers.
 
-## Academic scope and model credits
+The build creates `dist`, copies same-origin runtime assets, splits Demucs weights into 21 parts, and packages pinned MusicRNN assets. `.npmrc` disables dependency lifecycle scripts because the unused native Node inference runtime is unnecessary for the browser build.
 
-This is a **pretrained inference application**, not a new model or training result. The browser source-separation implementation comes from the `demucs` npm package by Kevin Gibbons and contributors (MIT code); its ONNX weights derive from Meta's pretrained Demucs weights. That package identifies weights as personal/research use only. This college demonstration is intended for that scope; the application license does not relicense the model.
+<details>
+<summary>Deploy, environment variables and model downloads</summary>
 
-References:
+Import the repository into Netlify using the root configuration: build `npm run build`, publish `dist`, Functions `netlify/functions`, Node 22. COOP/COEP headers are defined there for inference assets. Hosting/model bandwidth and Functions remain subject to provider plan limits.
 
-- Model and Python implementation: https://github.com/facebookresearch/demucs
-- Browser inference library: https://github.com/bakkot/demucs-js
-- Browser deployment inspiration: https://github.com/mcfredrick/client-side-ml
-- Product inspiration: https://github.com/ummerr/stems
-- Design reference: https://godly.design/websites/
+| Variable | Used for | Required? |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | Server-side Gemini coach access | Only for Gemini chat |
+| `GEMINI_MODEL` | Optional compatible model override | No; source discovers an available Flash model |
+| `steamlab` | Legacy server-side key alias | Only for existing compatibility; prefer canonical variable |
 
-The generated demo has known synthetic sources and tests the mixer; it is not a model separation result. Source leakage and audible artifacts remain possible. Loop boundaries use the UI timer and may have a small restart gap.
+Set server variables with Functions scope and redeploy. Never commit values. Blobs credentials are supplied by Netlify. No Gemini key is needed for Demucs, DSP effects, local presets or MusicRNN generation.
 
-## Original Python edition
+The first neural separation download is about 166 MiB. The composer lazily loads its worker and approximately 12 MB of weights per selected model family. Build-time model hashes are pinned in [web/composer-models.json](web/composer-models.json).
 
-The original local Python/FastAPI edition remains available via `start_windows.bat` and `run.py`. Its setup guide is in `LOCAL_SETUP.md`. Netlify builds the browser edition from `web/`; it does not run those Python files.
+</details>
 
-### Track tuning and local prompt suggestions
-Every original or imported track has a **Tune** disclosure with bass, presence,
-air, compression, room reverb, stereo position, pitch and independent formant controls. Apply renders effects
-locally using Web Audio; playback, individual WAV downloads and remix export use
-the same processed audio. Reset restores the unprocessed track. Save mix persists
-effect settings; reopening re-renders from the original audio. The original-stems
-ZIP remains unprocessed. Reverb is cropped to the track's duration.
+<details>
+<summary>Tuning, generation and voice-transform scope</summary>
 
-The prompt assistant matches built-in style keywords (bright, warm, smooth,
-punchy, vintage, radio, reverb, dry). It is a rule-based preset selector, not an
-LLM or audio generation model. Artist references suggest a general treatment,
-not voice cloning. Pitch correction and voice identity conversion are not provided.
+- Local prompt suggestions match built-in keywords/presets. They are labelled separately from Gemini replies.
+- Gemini is a text assistant that can propose validated settings for a selected track; Apply tuning renders locally. Connection success does not guarantee generation quota.
+- Tempo estimation uses drum onsets/autocorrelation and an editable grid assuming 4/4. It does not recognize harmony, song key, downbeats or variable-tempo structure reliably.
+- Drums use pretrained `drum_kit_rnn`; flute, bass and keys use `basic_rnn` phrases rendered by local synthesis. These are not realistic recorded instruments or full-song text-to-music generation.
+- Pitch/formant presets use Signalsmith DSP. A “female”/“male” request selects an approximate treatment; it does not guarantee perceived gender, clone a singer or perform automatic pitch correction. Pitch shifting changes the key against unshifted backing tracks.
+- Saving a session preserves settings; resetting restores original audio. The source-stem ZIP remains unprocessed.
 
-### Gemini studio chat setup
-The corner **Tune coach** button opens a text-only Gemini assistant. Chat requires
-an account and is limited to six requests per minute and forty per day per user.
-Only typed chat text and recent chat history are sent to Google; audio is never
-attached. The assistant suggests settings but does not operate the mixer. History
-is in memory, cleared on account changes, and not saved to the session database.
+</details>
 
-In Netlify → Project configuration → Environment variables, add `GEMINI_API_KEY`
-with Functions scope, then trigger a fresh production deploy. Do not put the key
-in browser code or GitHub. Leave `GEMINI_MODEL` unset to discover a compatible Flash model automatically.
-An optional `GEMINI_MODEL` can pin a model available to your key. Availability and quota depend on the Google account.
-Without a key, general Gemini chat shows a configuration message. A prior production
-connection and structured response were verified with the configured server key;
-ongoing availability depends on provider quota. Local voice transformations do not use it.
+## Limitations and next work
 
+Separation can leak sources and introduce artifacts; no SDR benchmark or listening study is reported. Loops can have a small restart gap. Browser memory limits input duration. Email verification/password recovery are absent; signup does not prove email ownership. Clearing site storage removes local audio.
 
-### Connected tuning workflow (21 October 2026)
-Open **Tune coach**, select a stem, and describe the desired sound. The coach
-returns validated values for all eight controls and an **Apply tuning** button.
-This renders the selected track locally and updates its sliders; save the mix
-to preserve settings. **Ask tune coach** in each track opens the same workflow.
-Suggestions are bound to the current session to prevent applying an old card to
-a different recording. Imported tracks can also be selected.
+Next: record a reproducible signed-in production smoke test, evaluate short licensed excerpts, improve recovery/export feedback, and test memory behavior on representative desktop devices.
 
-**Check connection** verifies server key/model access without generating audio or
-text; successful model access does not guarantee remaining generation quota.
-Errors distinguish missing/rejected keys, restrictions, unavailable models and
-quota. If generation fails, supported descriptions offer a separately labelled
-**Local preset (offline)**. That fallback is rule-based and is never presented as
-a Gemini answer. No voice cloning or pitch correction is added.
+## Credits and licensing
 
-If chat reports a model error, remove `GEMINI_MODEL` and redeploy. If it reports
-key/access errors, update `GEMINI_API_KEY` in the Netlify server environment and
-check Google AI Studio restrictions. Never paste credentials into the app or git.
+Repository history records development by Krishnakumar Mandal. The original Python/FastAPI edition remains in `app.py`, `worker.py` and `run.py`; Netlify deploys the separate `web/` edition.
 
-The existing Netlify variable `steamlab` is accepted as a compatibility alias for
-`GEMINI_API_KEY`. If Google rejects the canonical key as invalid, the configured
-alias is tried once. Permission and quota failures do not trigger key fallback.
-Key values remain server-side and are not returned by diagnostics.
+- [Meta Demucs](https://github.com/facebookresearch/demucs) and [demucs-js](https://github.com/bakkot/demucs-js): pretrained separation/model conversion and browser inference.
+- [Magenta.js](https://github.com/magenta/magenta-js): pretrained MusicRNN, Apache-2.0 code; bundled [composer notice](web/composer-license.txt).
+- [Signalsmith Stretch](https://github.com/Signalsmith-Audio/signalsmith-stretch): pitch/formant DSP; bundled [voice notice](web/voice-license.txt).
 
-### Free local AI instrument composer
-Open an active session and choose **Generate part**. The app estimates constant
-BPM and a beat-grid offset from that session's unprocessed drum stem. Both values
-are editable; silent/unclear input is explicitly marked uncertain. This is an
-onset-envelope/autocorrelation estimate, not neural beat tracking or downbeat,
-time-signature, chord or key recognition. The grid assumes 4/4. Choose melodic key
-and scale by ear; tempo/phase can be ambiguous or drift on variable-tempo music.
-
-Generation uses **Magenta MusicRNN**, with `drum_kit_rnn` for drums and `basic_rnn`
-(MelodyRNN) for flute, bass and keys. A small quantized seed is conditioned on the
-estimated grid; a pretrained recurrent model composes a 1–4 bar phrase. The phrase
-is rendered by a local synthesizer, optionally repeated to fill up to 30 seconds.
-These are synthesized instrument sounds, not realistic studio recordings or a
-full-song text-to-music model. No Gemini request, generation API fee or extra key
-is involved; the user's CPU and existing metered hosting bandwidth are still used.
-
-The generator lazily loads a 1.3 MB worker plus approximately 12 MB of model weights
-for the selected model family. Assets are self-hosted; the build checks pinned
-SHA-256 hashes against official hosted Magenta checkpoints. No recordings leave
-the device. Generation can be cancelled, and workers are released after a result.
-Preview the part, then **Add to this remix**. Generated tracks share the existing
-three-added-track limit, gain/tuning/mute/solo, start offsets, saved sessions and
-WAV/remix downloads. Changing sessions discards an unattached preview.
-
-Credits: Google Magenta and contributors, Apache-2.0 code.
-- https://github.com/magenta/magenta-js
-- https://github.com/magenta/magenta-js/blob/master/music/checkpoints/README.md
-- License is included in `web/composer-license.txt` and the deployed asset credits.
-
-### Vocal transformation / 22 October 2026
-**Tune Vocals** now has Feminine voice, Masculine voice and Lighter voice (same
-notes) presets. Pitch shifts notes from -12 to +12 semitones, while formants
-shift vocal resonance independently from -8 to +8 semitones. Both use 0.5 steps.
-Signalsmith Stretch 1.3.2 (MIT) renders through a local WASM AudioWorklet at rate 1;
-the resulting buffer has the original duration and is used for playback, stem
-downloads and remix export. Save mix stores settings; reopening renders raw audio
-again. Reset effects restores the original stem. HTTPS and AudioWorklet support
-are required. The versioned processor is lazy-loaded from this site.
-
-A request such as **change vocals to female** offers a labelled local vocal
-transformation immediately, without an API call or key. Its starting point is
-pitch +5 and formant +3 semitones; masculine uses -4 and -2. Apply the card to hear
-it. Select the vocal track and use Solo to compare it clearly. For an unchanged
-melody, choose Lighter voice or set pitch to 0. Pitch changes the key relative to
-backing instruments. Adjust by ear: DSP does not guarantee a natural female/male
-perception or clone any singer. General Gemini recommendations also understand
-the new controls. The effect is signal processing, not a newly trained AI model.
+The existing [LICENSE](LICENSE) separates application code from third-party model/data terms. The Demucs package's weights notice restricts use to personal/research scope; this README does not relicense those weights. Design/product references: [Godly](https://godly.design/websites/), [stems](https://github.com/ummerr/stems) and [client-side-ml](https://github.com/mcfredrick/client-side-ml).
