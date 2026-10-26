@@ -1,5 +1,5 @@
 export const defaults={low:0,mid:0,high:0,compression:0,reverb:0,pan:0,pitch:0,formant:0};
-export const controls=[['pitch','Vocal pitch',-12,12,.5,' st'],['formant','Vocal resonance / formants',-8,8,.5,' st'],['low','Bass / warmth',-12,12,1,' dB'],['mid','Presence',-12,12,1,' dB'],['high','Air / brightness',-12,12,1,' dB'],['compression','Compression',0,100,1,'%'],['reverb','Room reverb',0,50,1,'%'],['pan','Stereo position',-100,100,1,'']];
+export const controls=[['pitch','Pitch',-12,12,.5,' st'],['formant','Resonance',-8,8,.5,' st'],['low','Bass / warmth',-12,12,1,' dB'],['mid','Presence',-12,12,1,' dB'],['high','Air / brightness',-12,12,1,' dB'],['compression','Compression',0,100,1,'%'],['reverb','Room reverb',0,50,1,'%'],['pan','Stereo position',-100,100,1,'']];
 export function cleanSettings(value={}){return Object.fromEntries(controls.map(([k,,min,max,step])=>{const n=Number(value?.[k]);return[k,Number.isFinite(n)?Math.round(Math.max(min,Math.min(max,n))/step)*step:0]}))}
 export const voicePresets={
  feminine:{label:'Feminine voice',settings:{...defaults,pitch:5,formant:3,low:-2,mid:1,high:2,compression:20}},
@@ -21,3 +21,7 @@ export function interpretPrompt(text){const p=text.toLowerCase(),s={...defaults}
  if(/reset|natural|original/.test(p))set(defaults);
  return {settings:s,matched,message:/lata/.test(p)?'Applied a bright vintage vocal treatment inspired by your description. Effects do not recreate the singer’s voice.':'Applied local preset suggestions. Adjust the sliders to taste.'};
 }
+
+
+export function controlsForTrack(track){return controls.map(c=>c[0]==='formant'&&track==='vocals'?[c[0],'Vocal resonance / formants',...c.slice(2)]:c)}
+export function presetsForTrack(track){if(track==='vocals')return {...voicePresets,vintage:{label:'Light vintage vocal',settings:{...defaults,formant:1.5,low:-2,mid:2,high:3,compression:25,reverb:14}}};return track==='drums'?{tight:{label:'Tight drums',settings:{...defaults,low:2,mid:2,compression:35}},room:{label:'Room drums',settings:{...defaults,reverb:12,compression:20}}}:track==='bass'?{round:{label:'Round bass',settings:{...defaults,low:3,high:-3,compression:30}},defined:{label:'Defined bass',settings:{...defaults,mid:3,compression:25}}}:{warm:{label:'Warm tone',settings:{...defaults,low:2,high:-2}},bright:{label:'Bright tone',settings:{...defaults,high:3}}}}
