@@ -115,3 +115,9 @@ Repository history records development by Krishnakumar Mandal. The original Pyth
 - [Signalsmith Stretch](https://github.com/Signalsmith-Audio/signalsmith-stretch): pitch/formant DSP; bundled [voice notice](web/voice-license.txt).
 
 The existing [LICENSE](LICENSE) separates application code from third-party model/data terms. The Demucs package's weights notice restricts use to personal/research scope; this README does not relicense those weights. Design/product references: [Godly](https://godly.design/websites/), [stems](https://github.com/ummerr/stems) and [client-side-ml](https://github.com/mcfredrick/client-side-ml).
+
+
+## Leave Me Space (experimental)
+Open **Generate / Leave Me Space**, enable responses, choose the lead track, detect and review its active intervals, then generate flute, bass or keys responses. Density and breathing-room controls keep complete phrases out of the lead regions. Preview fixed/predicted intensity responses or the two comparison baselines, download the comparison WAVs/JSON, and add the preferred result to your remix. Generated audio and planning metadata persist with the session.
+
+A new small bidirectional GRU is bundled locally. It was trained on synthetic activity examples, not real musical preferences. See [the research protocol, training instructions and limitations](research/leave-me-space/README.md). Existing MusicRNN still supplies the notes; this model plans placement. This is a prototype for evaluation, not an established novel research result.
