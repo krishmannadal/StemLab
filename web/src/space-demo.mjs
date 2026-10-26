@@ -1,0 +1,9 @@
+import {initGenerator} from './generator.mjs';
+import {encodeWav} from './audio.mjs';
+const sr=22050,duration=12,lead=new Float32Array(sr*duration),back=new Float32Array(lead.length);
+for(const[a,b,f]of [[.2,2.2,220],[4.2,6.2,247],[8.2,10.2,262]])for(let i=Math.ceil(a*sr);i<b*sr;i++){const t=i/sr-a,env=Math.min(1,t/.05,(b-i/sr)/.08);lead[i]=.22*Math.sin(2*Math.PI*f*t)*env}
+for(let i=0;i<back.length;i++){const t=i/sr,beat=t%.5;back[i]=.1*Math.sin(2*Math.PI*70*beat)*Math.exp(-beat*35)}
+const buffer=samples=>({sampleRate:sr,numberOfChannels:1,length:samples.length,duration,getChannelData:()=>samples});
+document.getElementById('lead-preview').src=URL.createObjectURL(encodeWav([lead,lead],sr));let mixURL;
+initGenerator({getSession:()=>({id:'space-synthetic-demo',title:'Three lead phrases · 120 BPM · synthetic',duration,sampleRate:sr,analysis:buffer(back),leadTracks:[{id:'vocals',name:'Synthetic lead',buffer:buffer(lead),start:0}],position:0,capacity:3,busy:false}),addToSession:async part=>{const mix=lead.map((x,i)=>x+(part.samples[i]||0)+back[i]);if(mixURL)URL.revokeObjectURL(mixURL);mixURL=URL.createObjectURL(encodeWav([mix,mix],sr));document.getElementById('demo-mix').src=mixURL;document.getElementById('demo-download').href=mixURL;document.getElementById('demo-added').textContent=part.name+' added. The original lead stays intact.';document.getElementById('demo-output').hidden=false;document.getElementById('demo-output').scrollIntoView({behavior:'smooth'})}});
+const open=document.getElementById('generate-open');open.addEventListener('click',()=>{if(open.getAttribute('aria-expanded')==='true'){document.getElementById('space-enable').checked=true;document.getElementById('gen-instrument').value='flute';document.getElementById('gen-bars').value='1';document.getElementById('space-detect').click()}});

@@ -28,3 +28,7 @@ await copyFile(path.join(root,'web/composer-license.txt'),path.join(out,'compose
 await mkdir(path.join(out,'voice'),{recursive:true});
 await copyFile(path.join(root,'node_modules/signalsmith-stretch/SignalsmithStretch.mjs'),path.join(out,'voice/SignalsmithStretch-1.3.2.mjs'));
 await copyFile(path.join(root,'web/voice-license.txt'),path.join(out,'voice-license.txt'));
+
+
+await build({entryPoints:[path.join(root,'web/src/space-demo.mjs')],bundle:true,format:'iife',outfile:path.join(out,'space-demo.js'),minify:true,target:'es2022'});
+await copyFile(path.join(root,'web/src/space-demo.html'),path.join(out,'space-demo.html'));
