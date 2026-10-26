@@ -123,3 +123,14 @@ Seven Node test cases pass, including correct gain/mute handling and time offset
   visually reviewed at 390px with no horizontal overflow.
 - No perceptual listening study or guarantee of natural gender presentation.
   This is local DSP, not voice cloning or automatic pitch correction.
+
+
+## Leave Me Space — 26 October 2026
+- 25 Node tests pass, including JavaScript/PyTorch GRU parity (<1e-6), density and breathing-room constraints, continuous-lead infeasibility, release-tail containment, annotation parsing and stereo/offset detection.
+- Production build succeeds. Public app.js and space-demo.js hashes matched the tested local build after deployment.
+- Live cloud-browser demo ran the actual MelodyRNN worker (no mocked model); detected the known synthetic intervals 0.20–2.20, 4.20–6.20 and 8.20–10.20 seconds.
+- The recorded trial produced three responses at 25% phrase-window density. Comparison JSON and all four WAVs downloaded successfully; each WAV was 12 seconds. Actual exported planned/expressive PCM had zero nonzero samples within the synthetic lead intervals. This confirms containment for that fixture, not real-music performance.
+- Fixed-intensity planned, continuous and muted outputs each had approximately 2.88 audible seconds at the report's sample threshold. Continuous placement overlapped the marked lead for 2.00 seconds. Muting produced five cut source phrases by the implementation's fragment definition. See research/leave-me-space/live-synthetic-report.json for the exact diagnostic values. These are not a blind listening study or independent test-set evaluation.
+- Predicted-intensity and muting previews changed through the UI; Add to remix produced the combined demo; its WAV downloaded. A full-duration lead annotation correctly returned “No complete response fits.”
+- Main-studio integration uses the existing added-track persistence/export path. A fresh authenticated save/reopen browser run was not performed in this turn; the public demo does not test account storage.
+- Local Chromium could not launch due environment socket restrictions, so browser generation/export checks were performed on the deployed public demo. Mobile layout was not newly browser-tested.
